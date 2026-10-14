@@ -1,0 +1,44 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Service Item Import Tool{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+<body>
+<header class="topbar">
+  <button id="sidebar-toggle" class="icon-button d-lg-none" aria-label="Toggle navigation"><i class="bi bi-list"></i></button>
+  <a class="brand" href="{% url 'dashboard' %}"><span class="brand-mark"><i class="bi bi-plus-lg"></i></span><span><strong>Service Item Import Tool</strong><small>Interactive Prototype</small></span></a>
+  <div class="topbar-right">
+    <form action="{% url 'select_facility' %}" method="post" class="facility-form">{% csrf_token %}
+      <i class="bi bi-building"></i><select name="facility_id" aria-label="Demonstration facility" onchange="this.form.submit()">{% for facility in facilities %}<option value="{{ facility.id }}" {% if current_facility.id == facility.id %}selected{% endif %}>{{ facility.name }}</option>{% endfor %}</select>
+    </form>
+    <span class="language-pill" title="English interface; Arabic layout is reserved for a future iteration">EN</span>
+    <span class="user-chip"><i class="bi bi-person-circle"></i><span>Demo User</span></span>
+  </div>
+</header>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">Workspace</div>
+    <nav aria-label="Main navigation">
+      <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"><i class="bi bi-grid-1x2"></i>Dashboard</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'items' or request.resolver_match.url_name == 'item_detail' %}active{% endif %}" href="{% url 'items' %}"><i class="bi bi-collection"></i>Service Items</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'import_new' %}active{% endif %}" href="{% url 'import_new' %}"><i class="bi bi-cloud-arrow-up"></i>Import Service Items</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'history' %}active{% endif %}" href="{% url 'history' %}"><i class="bi bi-clock-history"></i>Import History</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'references' %}active{% endif %}" href="{% url 'references' %}"><i class="bi bi-diagram-3"></i>Reference Management</a>
+    </nav>
+    <div class="sidebar-section sidebar-lower">Prototype</div>
+    <nav><a class="nav-link {% if request.resolver_match.url_name == 'demo' %}active{% endif %}" href="{% url 'demo' %}"><i class="bi bi-sliders"></i>Demo Administration</a></nav>
+    <div class="sidebar-foot">Local demonstration environment<br>Data remains in this SQLite database</div>
+  </aside>
+  <main class="workspace" id="workspace">
+    {% if messages %}<div class="message-stack">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>{% endfor %}</div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/app.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body></html>

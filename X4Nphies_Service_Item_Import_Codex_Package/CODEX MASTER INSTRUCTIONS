@@ -1,0 +1,1633 @@
+# CODEX MASTER INSTRUCTIONS
+# Service Item Import Tool — Standalone Interactive Prototype
+
+**Project type:** Standalone, dynamic, functional prototype (Proof of Concept)
+**Primary audience:** Healthcare operations stakeholders, business analysts, and the development team
+**Technology:** Python, Django, SQLite, Bootstrap, JavaScript
+**Visual reference:** Existing X4Nphies application
+**Integration requirement:** None at this stage
+**Primary objective:** Demonstrate the proposed Service Item Import Tool through real, interactive workflows.
+
+---
+
+# 1. Your Role
+
+Act as a senior full-stack Python/Django developer, solution architect, and UX engineer.
+
+Your assignment is to design and implement a **standalone, interactive, dynamic functional prototype** of an Enterprise Service Item Import Tool.
+
+This prototype will be demonstrated to our team to:
+
+- Explain the proposed solution.
+- Demonstrate how the import process should work.
+- Let stakeholders interact with actual features.
+- Validate business requirements.
+- Collect feedback.
+- Refine the design before production development.
+
+The prototype must look professional and perform real operations.
+
+**Do not build a static mockup. Do not build a fake simulation of an import system.**
+
+At the same time, **do not overengineer a production enterprise platform**.
+
+The main priorities, in order, are:
+
+1. Correct and understandable functionality.
+2. A polished stakeholder demonstration.
+3. Simple architecture.
+4. Fast development and modification.
+5. Reliable processing of the supplied demonstration data.
+6. A sensible path toward future production implementation.
+
+---
+
+# 2. Available Project Files
+
+Start by examining the current project directory.
+
+The existing structure is:
+
+```text
+X4Nphies_Service_Item_Import_Codex_Package/
+├── SERVICE_ITEM_IMPORT_SPEC.md
+└── sources/
+    ├── Pasted text(20261014-200541).txt
+    ├── Pasted text (2)(1).txt
+    └── Untitled spreadsheet - Sheet1.csv
+```
+
+Read all four files.
+
+## 2.1 Master Specification
+
+`SERVICE_ITEM_IMPORT_SPEC.md` contains detailed functional and technical requirements.
+
+Use it as the primary reference for:
+
+- Import workflows.
+- Field mapping.
+- Validation.
+- Missing-reference resolution.
+- Duplicate handling.
+- Partial-success importing.
+- Background processing.
+- Reporting.
+- Reliability.
+- Acceptance tests.
+
+**However, this instruction document takes precedence wherever the original specification requires production-level infrastructure or direct integration into X4Nphies.**
+
+## 2.2 Full-Page HTML Reference
+
+`Pasted text(20261014-200541).txt`
+
+Use it to understand the original application's visual appearance:
+
+- Top header.
+- Navigation sidebar.
+- Facility selector.
+- Layout conventions.
+- Typography.
+- Cards.
+- Tables.
+- Navigation structure.
+- General healthcare administration styling.
+
+This is a rendered HTML snapshot, not application source code.
+
+## 2.3 Service Item Page Reference
+
+`Pasted text (2)(1).txt`
+
+Use it to understand the Service Item Management experience.
+
+The captured screen includes search fields for:
+
+- Hospital Code.
+- Code.
+- Description.
+- Status.
+- Is packages.
+
+It also includes toolbar actions for:
+
+- Export.
+- Download Sample.
+- Upload.
+- Add Item.
+- Add Multiple Items.
+- Sync.
+
+The listing includes Chapter, Block, Code, descriptions, Hospital Code, Alias, Status, and Actions.
+
+Use these elements as inspiration for the prototype's Service Item Management screen.
+
+Do not attempt to call unknown APIs from the original application.
+
+## 2.4 CSV Reference
+
+`Untitled spreadsheet - Sheet1.csv`
+
+Use this file as the primary demonstration and test dataset.
+
+The reference sample contains **49 records and 33 columns**.
+
+The prototype must support the actual column names and values from this file, including their spelling variations.
+
+---
+
+# 3. Critical Scope Clarification
+
+## 3.1 What We Are Building
+
+A **standalone, browser-based, interactive functional prototype**.
+
+It must contain:
+
+- A real frontend.
+- A real Django backend.
+- A real local database.
+- Real file uploading and parsing.
+- Real field mapping.
+- Real data validation.
+- Real reference lookup and resolution.
+- Real data insertion and updating.
+- Real background job execution.
+- Real progress tracking.
+- Real downloadable reports.
+
+It must be possible to run the prototype locally on a developer laptop.
+
+## 3.2 What We Are Not Building
+
+We are not:
+
+- Integrating with the actual X4Nphies backend.
+- Modifying the existing X4Nphies application.
+- Integrating with Odoo or another ERP.
+- Recreating the entire healthcare application.
+- Implementing enterprise high availability.
+- Building a distributed microservices platform.
+- Requiring cloud infrastructure.
+- Building a production-scale Kubernetes deployment.
+- Claiming that the prototype has been proven to import millions of records.
+
+We want a working demonstration of the **business concept and proposed user experience**.
+
+## 3.3 Prototype Label
+
+Clearly identify the application as:
+
+**Service Item Import Tool**
+
+With the secondary designation:
+
+**Interactive Prototype**
+
+Display this label in the application header.
+
+The prototype must not be represented as the live X4Nphies product.
+
+---
+
+# 4. Mandatory Technology Stack
+
+Use a simple, maintainable, monolithic architecture.
+
+| Component | Required Technology |
+|---|---|
+| Programming language | Python 3.12+ |
+| Backend framework | Django 5.2 LTS |
+| Frontend rendering | Django templates |
+| UI framework | Bootstrap 5 |
+| Styling | Custom CSS variables |
+| Interactivity | Vanilla JavaScript |
+| Optional interactivity | HTMX, only if useful |
+| Database | SQLite |
+| CSV processing | Python standard `csv` module |
+| XLSX processing | `openpyxl` |
+| ORM | Django ORM |
+| Background execution | Separate Python worker using a Django management command |
+| Progress updates | JavaScript polling |
+| Reports | CSV, optionally XLSX |
+| Icons | Bootstrap Icons |
+| Development environment | Python virtual environment |
+
+## 4.1 Technologies to Avoid
+
+Do not introduce the following unless an essential requirement cannot reasonably be met otherwise:
+
+- React.
+- Next.js.
+- Vue.
+- Angular.
+- Separate frontend SPA.
+- Tailwind CSS.
+- Material UI.
+- Redis.
+- Celery.
+- RabbitMQ.
+- Kafka.
+- Microservices.
+- Kubernetes.
+- Docker as a mandatory runtime.
+- Complex frontend build pipelines.
+
+Avoid creating a separate REST API for every screen when an ordinary Django view is sufficient.
+
+JSON endpoints are acceptable where needed for progress polling and dynamic interactions.
+
+## 4.2 Why This Stack
+
+The system must be easy to understand and change.
+
+A single developer or coding agent should be able to:
+
+- Add a new field.
+- Modify a validation rule.
+- Change an import-screen layout.
+- Update a business rule.
+- Add a new reference type.
+- Extend an error report.
+
+Without modifying several unrelated services or build pipelines.
+
+## 4.3 Project Structure
+
+Use a straightforward structure, for example:
+
+```text
+project/
+├── manage.py
+├── requirements.txt
+├── README.md
+├── .env.example
+├── setup.sh
+├── run.sh
+├── run_worker.sh
+├── reset_demo.sh
+├── config/
+├── imports/
+├── service_items/
+├── references/
+├── templates/
+├── static/
+│   ├── css/
+│   │   └── theme.css
+│   └── js/
+├── media/
+├── tests/
+└── sources/
+```
+
+This is an illustrative structure. Keep it simple and adapt it where appropriate.
+
+---
+
+# 5. Mandatory Theme and Visual Design
+
+Create a professional **X4Nphies-inspired healthcare administration theme**.
+
+Use the supplied HTML captures as visual references.
+
+The interface should feel familiar to users of a healthcare ERP or revenue-cycle management system.
+
+However, it does not need to be a pixel-perfect replica.
+
+## 5.1 Design Direction
+
+The visual style must be:
+
+- Modern.
+- Clean.
+- Professional.
+- Healthcare-oriented.
+- Data-focused.
+- Easy to understand.
+- Consistent across screens.
+- Suitable for demonstrating to hospital administrators.
+
+Use a light theme.
+
+## 5.2 Theme Palette
+
+Use the following suggested design tokens:
+
+| Token | Color | Usage |
+|---|---|---|
+| Primary | `#1976D2` | Navigation, links, primary buttons |
+| Header | `#1769AA` | Application header |
+| Teal | `#27B1A2` | Import, export, workflow actions |
+| Success | `#28A745` | Valid and imported records |
+| Warning | `#F0AD4E` | Warnings, pending references |
+| Danger | `#DC3545` | Invalid and failed records |
+| Background | `#F5F7FA` | Main workspace |
+| Surface | `#FFFFFF` | Cards and tables |
+| Text | `#243247` | Primary text |
+| Muted | `#64748B` | Secondary text |
+| Border | `#E1E6ED` | Card and table borders |
+
+Implement colors through CSS custom properties in `static/css/theme.css`.
+
+Avoid hardcoding colors separately throughout templates.
+
+## 5.3 Application Shell
+
+Create a consistent layout containing:
+
+**Top Header**
+- Application name.
+- Interactive Prototype label.
+- Selected demonstration facility.
+- Language selector.
+- User/avatar indicator.
+
+**Left Sidebar**
+- Dashboard.
+- Service Items.
+- Import Service Items.
+- Import History.
+- Reference Management.
+- Prototype Settings / Demo Reset.
+
+**Main Workspace**
+- Page title.
+- Breadcrumbs where appropriate.
+- Search and action panels.
+- Cards.
+- Tables.
+- Wizards.
+- Status messages.
+
+The sidebar should be collapsible where practical.
+
+## 5.4 UI Components
+
+Provide consistent styling for:
+
+- Buttons.
+- Form fields.
+- Dropdowns.
+- Tables.
+- Status badges.
+- Progress bars.
+- Alerts.
+- Validation messages.
+- Confirmation dialogs.
+- Modals.
+- Pagination.
+- Step indicators.
+- Empty states.
+- Loading states.
+
+Prefer compact tables because the Service Item dataset contains many fields.
+
+## 5.5 Localization
+
+Build English-first.
+
+Keep visible strings structured for future translation.
+
+Support a basic English/Arabic language option if feasible within prototype scope.
+
+Ensure RTL layouts can be supported without major redesign.
+
+Do not allow localization work to delay the core importing workflow.
+
+## 5.6 Presentation Requirement
+
+The prototype should be visually convincing, but every interactive control must have meaningful functionality.
+
+Do not create buttons that appear functional but do nothing.
+
+If a feature is planned but not implemented, either hide it or visibly mark it as unavailable.
+
+---
+
+# 6. Main Application Screens
+
+Implement the following screens.
+
+## 6.1 Dashboard
+
+Provide an overview with:
+
+- Total Service Items.
+- Total import jobs.
+- Successful imports.
+- Imports completed with errors.
+- Pending reference resolutions.
+- Most recent import activity.
+
+Provide a prominent:
+
+**New Import**
+
+action.
+
+These figures must be calculated from actual prototype data.
+
+## 6.2 Service Item Management
+
+Inspired by the supplied Service Item HTML.
+
+Include:
+
+- Search by Code.
+- Search by Hospital Code.
+- Search by Description.
+- Filter by Status.
+- Filter by Is Package.
+- Search and Reset controls.
+- Paginated Service Item table.
+- View record.
+- Edit record.
+- Export records.
+- Download import sample.
+- Upload / Import.
+
+Use actual records stored in SQLite.
+
+For non-import actions shown in the original HTML, prioritize the ones useful for the prototype and do not fabricate unavailable integration functionality such as a live X4Nphies sync.
+
+## 6.3 Import Wizard
+
+This is the primary feature.
+
+Implement the complete interactive sequence:
+
+**Upload → Preview → Map Fields → Configure → Test Import → Review Errors → Resolve References → Retest → Confirm → Import → Final Results**
+
+The wizard must preserve progress when navigating between its steps.
+
+## 6.4 Import History
+
+Display previous jobs with:
+
+- Job ID.
+- Filename.
+- Submitted date.
+- Facility.
+- Record count.
+- Import mode.
+- Job status.
+- Created count.
+- Updated count.
+- Failed count.
+- Actions to view results and reports.
+
+## 6.5 Reference Management
+
+Provide a basic interface for viewing and managing demonstration reference data.
+
+It should support the reference types used by the CSV.
+
+## 6.6 Demo Administration
+
+Provide a simple way to:
+
+- Reset demonstration records.
+- Reset import history if requested.
+- Seed example references.
+- Load a sample demonstration dataset.
+- Prepare a repeatable demonstration.
+
+Require confirmation for destructive reset actions.
+
+---
+
+# 7. Upload and Preview
+
+The user must be able to upload a file directly from the browser.
+
+## 7.1 Formats
+
+Support:
+
+- CSV — required.
+- XLSX — desirable and should be implemented using `openpyxl` if straightforward.
+
+## 7.2 Upload Features
+
+Provide:
+
+- Browse Files.
+- Drag and Drop.
+- File information.
+- Upload status.
+- File size.
+- Record count.
+- Format detection.
+- Friendly validation errors.
+
+Store the uploaded file in a local application media directory.
+
+Never import production Service Items merely because a file was uploaded.
+
+## 7.3 Data Preview
+
+Show a paginated preview of actual uploaded data.
+
+Include:
+
+- Original column names.
+- Row numbers.
+- Original field values.
+- Empty-value indicators.
+- Column-mapping suggestions.
+
+Avoid placing an entire large dataset into a single HTML response.
+
+---
+
+# 8. CSV Schema
+
+The sample CSV contains the following source columns:
+
+```text
+Code
+ShortDescription
+LongDesription
+HospitalCode
+HospitalDescription
+IsListed
+IsPackge
+Alias
+Chapter
+Block
+CostCenter
+SubCostCenter
+Department
+SubDepatment
+Category
+TaxCategory
+Type
+MaterialCost
+RegisterNumber
+ScientificName
+ScientificCode
+DescriptionCode
+Strength
+StrengthUnit
+PharmaceuticalForm
+AdministrationRoute
+PackageTypes
+PackageSize
+ProductControl
+DistributeArea
+DiscontinuedDate
+PublicPrice
+Status
+```
+
+## 8.1 Important Header Aliases
+
+Support:
+
+- `LongDesription` → Long Description.
+- `IsPackge` → Is Package.
+- `SubDepatment` → Sub Department.
+
+Preserve original headers in the uploaded source data.
+
+## 8.2 Data Handling
+
+Treat:
+
+- Code as a string.
+- Hospital Code as a string.
+- Scientific Code as a string.
+- Other identifiers as strings unless explicitly configured otherwise.
+- Money as decimal values.
+- Blank values as nullable values, not automatically zero or false.
+- Percentage values with explicit conversion rules.
+- Dates with configurable interpretation.
+
+The sample contains a date representation similar to:
+
+`4/11/2025 12:00:00 AM`
+
+Do not silently choose a date interpretation when ambiguous.
+
+Let the user confirm the date format when needed.
+
+---
+
+# 9. Field Mapping
+
+After preview, display the Field Mapping screen.
+
+## 9.1 Mapping Table
+
+Each mapping row should show:
+
+- Original source column.
+- Example source value.
+- Suggested target field.
+- Target data type.
+- Required or optional.
+- Transformation.
+- Reference lookup behavior.
+- Mapping status.
+
+## 9.2 Mapping Interactions
+
+Allow the user to:
+
+- Accept suggestions.
+- Change a mapping.
+- Ignore optional source columns.
+- Select transformations.
+- Configure defaults.
+- Save a mapping template.
+- Reuse a previous mapping.
+
+## 9.3 Transformations
+
+Support a practical initial set:
+
+- Trim whitespace.
+- Normalize empty values.
+- Convert yes/no to boolean.
+- Parse decimal.
+- Parse percentage.
+- Parse date.
+- Map selection values.
+- Lookup reference values.
+
+Keep transformation rules understandable and easy to modify.
+
+Do not build a general-purpose visual programming language for transformations.
+
+---
+
+# 10. Import Configuration
+
+Provide configuration controls for:
+
+## 10.1 Import Mode
+
+- Create Only.
+- Update Only.
+- Create or Update (Upsert).
+- Skip Existing.
+
+## 10.2 Duplicate Handling
+
+Allow configuration for:
+
+- Duplicates within the uploaded file.
+- Records already existing in the prototype database.
+
+Use a clearly documented business key.
+
+For the standalone prototype, a reasonable initial model is **Facility + Service Code**, provided this is identified as a prototype assumption.
+
+## 10.3 Blank Values on Update
+
+Support:
+
+- Preserve existing destination value.
+- Clear existing destination value.
+- Use configured default.
+
+## 10.4 Import Policy
+
+Default:
+
+**Import all eligible records and report errors separately.**
+
+Also provide a strict mode in which unresolved blocking errors prevent execution.
+
+---
+
+# 11. Real Test Import and Validation
+
+Implement a genuine validation process.
+
+The user must be able to start a **Test Import** without writing Service Items to the destination table.
+
+## 11.1 Validation Must Check
+
+- Required fields.
+- Invalid types.
+- Invalid decimal values.
+- Invalid dates.
+- Unsupported selections.
+- Missing references.
+- Ambiguous references.
+- Duplicate source records.
+- Existing destination conflicts.
+- Hierarchical-reference mismatches.
+- Conditional business rules.
+
+## 11.2 Record Statuses
+
+Every source record must have a clear classification:
+
+- Valid.
+- Valid with Warnings.
+- Invalid.
+- Pending Reference Resolution.
+- Duplicate / Conflict.
+- Excluded by User.
+
+## 11.3 Validation Results Screen
+
+Display counters and filterable records.
+
+Examples:
+
+- Total.
+- Valid.
+- Warnings.
+- Errors.
+- Missing References.
+- Duplicates.
+
+Show the source row number, field, original value, and explanation for each issue.
+
+Allow downloading validation results.
+
+## 11.4 Important Sample Rules
+
+The sample contains empty values for some fields.
+
+Do not automatically treat every empty field as an error.
+
+For example:
+
+- `IsListed` may be optional.
+- `PublicPrice` may be optional.
+- A populated `DiscontinuedDate` with Active status may be a warning rather than a blocking error.
+
+Make these configurable prototype rules.
+
+---
+
+# 12. Missing Reference Resolution — Mandatory Feature
+
+This is one of the most important parts of the demonstration.
+
+The tool must identify reference values that do not exist in its reference tables.
+
+Examples include:
+
+- Chapter.
+- Block.
+- Cost Center.
+- Sub Cost Center.
+- Department.
+- Sub Department.
+- Category.
+- Tax Category.
+- Type.
+- Strength Unit.
+- Pharmaceutical Form.
+- Administration Route.
+- Package Type.
+- Product Control.
+- Distribution Area.
+
+## 12.1 Missing Reference Screen
+
+Group missing values by:
+
+- Reference field.
+- Missing source value.
+- Relevant parent.
+- Number of affected rows.
+
+For example:
+
+| Reference | Missing Value | Affected Rows | Decision |
+|---|---|---:|---|
+| Chapter | Pharmaceuticals | 12 | Choose action |
+| Block | Antibiotics | 7 | Choose action |
+| Department | Pharmacy | 5 | Choose action |
+
+These are illustrative examples, not assumed results from the actual CSV.
+
+## 12.2 User Decisions
+
+Allow:
+
+**Map to Existing**
+Choose an existing reference record.
+
+**Create New Reference**
+Create a new reference in the prototype database after explicit user approval.
+
+**Leave Empty**
+Allowed only if the field is optional.
+
+**Skip Affected Records**
+Exclude them from import and show them in the report.
+
+**Defer**
+Keep the records pending without importing them.
+
+## 12.3 No Silent Creation
+
+Never automatically create missing references during Test Import.
+
+Never create references merely because a source value is unrecognized.
+
+The user must explicitly approve new reference creation.
+
+## 12.4 Hierarchical References
+
+Enforce basic parent-child relationships:
+
+- Chapter → Block.
+- Cost Center → Sub Cost Center.
+- Department → Sub Department.
+
+The same child label under two different parents must be treated as potentially different references.
+
+## 12.5 Retest
+
+When the user changes reference decisions:
+
+- Save the decisions.
+- Update applicable mappings.
+- Retest affected records.
+- Refresh import eligibility.
+
+---
+
+# 13. Partial-Success Import — Mandatory Feature
+
+This is a critical business requirement.
+
+**Valid records must be imported even when other records have errors.**
+
+Do not block the entire file because of a few invalid records.
+
+## 13.1 Example
+
+Suppose a file contains 1,000 records:
+
+- 900 valid.
+- 50 invalid.
+- 30 unresolved references.
+- 20 duplicates excluded by policy.
+
+The tool should be able to import the 900 valid records and report the remaining 100 appropriately.
+
+The user must see this before confirming.
+
+## 13.2 Confirmation Screen
+
+Show:
+
+- Total source records.
+- Records eligible to create.
+- Records eligible to update.
+- Valid-with-warning count.
+- Records to skip.
+- Records blocked by errors.
+- Unresolved references.
+- Approved reference creations.
+
+Provide:
+
+**Import Eligible Records**
+
+as the main action.
+
+## 13.3 Import Execution
+
+During actual import:
+
+- Process eligible records.
+- Isolate failures.
+- Continue processing unrelated records.
+- Record the result of every row.
+- Avoid duplicate creation.
+- Allow safe retry of eligible failures.
+
+## 13.4 Outcome States
+
+Support:
+
+- Completed Successfully.
+- Completed with Errors.
+- Failed.
+- Cancelled.
+
+A job that imports some records and rejects others should normally be **Completed with Errors**, not Failed.
+
+---
+
+# 14. Background Processing — Simple but Real
+
+The prototype must demonstrate genuine background processing.
+
+Do not use a fake timer to pretend that data is being imported.
+
+## 14.1 Worker Architecture
+
+Use a lightweight Django management command.
+
+For example:
+
+```bash
+python manage.py run_import_worker
+```
+
+The worker should:
+
+1. Poll the database for queued jobs.
+2. Claim a job safely.
+3. Process bounded batches.
+4. Persist progress.
+5. Record errors.
+6. Handle user pause/cancel requests.
+7. Mark final job status.
+
+Use one worker by default.
+
+## 14.2 Database Considerations
+
+SQLite is acceptable for this local prototype.
+
+Avoid holding long write transactions while parsing large files.
+
+Use short transactions and a single active import worker.
+
+Handle temporary SQLite locking safely.
+
+Do not present this configuration as a proven solution for high-concurrency enterprise importing.
+
+## 14.3 Progress
+
+Show:
+
+- Total records.
+- Processed records.
+- Successful records.
+- Failed records.
+- Skipped records.
+- Percentage complete.
+- Current job status.
+- Processing duration.
+- Recent errors.
+
+Use browser polling to obtain actual persisted progress.
+
+The progress bar must reflect actual work.
+
+## 14.4 Worker Controls
+
+Support practical controls:
+
+- Pause.
+- Resume.
+- Cancel.
+
+Apply them at safe batch boundaries.
+
+The page may be refreshed without losing the job state.
+
+The worker should be capable of recovering safely after an unexpected restart.
+
+---
+
+# 15. Persisted Data Models
+
+Implement a simple but coherent database model.
+
+At minimum, include logical models equivalent to:
+
+## ServiceItem
+
+Stores the imported Service Item fields and their resolved reference relationships.
+
+## ReferenceValue
+
+Stores demonstration reference values, with support for parent-child relationships where needed.
+
+Use dedicated models if they materially simplify the actual schema.
+
+## ImportJob
+
+Stores:
+
+- File.
+- Facility.
+- User.
+- Mapping configuration.
+- Import mode.
+- Job state.
+- Record counts.
+- Start/end timestamps.
+- Progress.
+
+## ImportRow
+
+Stores:
+
+- Original row number.
+- Original source data.
+- Mapped data.
+- Validation status.
+- Import status.
+- Error information.
+- Destination Service Item ID when successful.
+
+## ImportIssue
+
+Stores validation and execution issues.
+
+## ImportReferenceResolution
+
+Stores user decisions about missing references.
+
+## ImportBatch
+
+Stores batch checkpoints if needed for reliable worker processing.
+
+## ImportMappingTemplate
+
+Stores reusable column mappings.
+
+Keep the models straightforward.
+
+Use Django migrations.
+
+Use foreign keys and indexes where useful.
+
+Avoid unnecessary generalized metadata frameworks.
+
+---
+
+# 16. Final Results and Error Reports
+
+After the import finishes, display a complete results screen.
+
+## 16.1 Results Summary
+
+Show:
+
+- Total source records.
+- Created.
+- Updated.
+- Successfully imported with warnings.
+- Skipped.
+- Failed.
+- Deferred or unresolved.
+- Total successful.
+- Import duration.
+- Final job status.
+
+Ensure the counts reconcile.
+
+For example, a successful-with-warning record is still one successful record, not two separate records.
+
+## 16.2 Errors Table
+
+Include:
+
+- Source row.
+- Service Code.
+- Description.
+- Field.
+- Original value.
+- Error type.
+- Error message.
+- Suggested correction.
+- Final status.
+- Retry eligibility.
+
+## 16.3 Downloadable Reports
+
+Provide:
+
+- Import Summary CSV.
+- Error Details CSV.
+- Failed Records CSV.
+
+XLSX reports may be included where practical.
+
+## 16.4 Correct and Reimport
+
+Users must be able to:
+
+1. Download failed records.
+2. Correct the original values.
+3. Upload the corrected file.
+4. Reuse the saved mapping.
+5. Run validation again.
+6. Import newly eligible records.
+
+Link retry jobs to the original import job.
+
+Do not duplicate records successfully imported previously.
+
+---
+
+# 17. Demo Reference Data
+
+Create realistic demonstration reference data so the CSV can produce meaningful validation results.
+
+The reference data should represent common categories and organizational structures used by healthcare Service Items.
+
+Include enough values to demonstrate:
+
+- Successful lookups.
+- Missing lookups.
+- Ambiguous matches.
+- Hierarchical relationships.
+- Approved creation of new references.
+
+**Do not seed every CSV reference value automatically.**
+
+Doing so would eliminate the missing-reference scenario and make that feature impossible to demonstrate.
+
+Provide deterministic seed fixtures.
+
+Clearly distinguish demo fixture assumptions from real X4Nphies master data.
+
+---
+
+# 18. Repeatable Demonstration Scenario
+
+Prepare a presentation flow that demonstrates the complete idea.
+
+## Scenario A — Successful Upload
+
+Upload the original CSV.
+
+Show:
+
+- File preview.
+- The 33 detected columns.
+- Automatic mapping suggestions.
+- Field configuration.
+
+## Scenario B — Real Validation
+
+Start Test Import.
+
+Show actual results:
+
+- Valid records.
+- Warnings.
+- Errors.
+- Missing references.
+- Existing-record conflicts, where applicable.
+
+## Scenario C — User-Controlled References
+
+Choose a missing reference.
+
+Demonstrate:
+
+- Mapping it to an existing reference.
+- Creating a new demo reference with approval.
+- Skipping or deferring affected records.
+
+Retest.
+
+## Scenario D — Partial Success
+
+Deliberately include some invalid records in a separate, clearly identified demo dataset.
+
+Show that:
+
+- Eligible records are imported.
+- Invalid records are excluded.
+- Errors remain visible.
+- Import progress reflects actual processing.
+
+## Scenario E — Final Results
+
+Show:
+
+- Created and updated counts.
+- Skipped and failed counts.
+- Downloadable error report.
+- Imported Service Items in the database.
+
+## Scenario F — Correction and Retry
+
+Correct a failed record.
+
+Reupload and successfully import that record without duplicating previous successes.
+
+## Scenario G — History
+
+Open Import History and inspect the completed job.
+
+## Demo Data Rule
+
+The original uploaded CSV must remain unchanged.
+
+If additional invalid or duplicate records are needed for demonstration, create a **separate synthetic demo CSV** with clear naming.
+
+---
+
+# 19. Performance Expectations
+
+Keep the implementation efficient but realistic.
+
+## Prototype Goals
+
+The system should comfortably process the supplied CSV.
+
+It should also be architected to support larger datasets without loading all records into browser memory.
+
+Use:
+
+- CSV streaming.
+- Batch processing.
+- Paginated tables.
+- Efficient reference lookups.
+- Persistent progress.
+- Short database transactions.
+
+## Benchmarking
+
+Create optional synthetic files for:
+
+- 1,000 records.
+- 10,000 records.
+- 100,000 records.
+
+Benchmark what the current environment can reasonably handle.
+
+A million-record test is optional and must not be required to complete the prototype.
+
+Document measured performance.
+
+## Production Limitations
+
+Clearly document that the following are future production considerations:
+
+- PostgreSQL.
+- Scalable job queues.
+- Distributed workers.
+- High availability.
+- Advanced resource throttling.
+- Enterprise observability.
+- Large-scale concurrency testing.
+- Security and deployment hardening.
+
+Do not implement unnecessary infrastructure merely to satisfy these future concerns.
+
+---
+
+# 20. Basic Security and Reliability
+
+Although this is a prototype, implement sensible safeguards.
+
+At minimum:
+
+- Validate uploads.
+- Restrict allowed file types.
+- Protect against path traversal.
+- Use Django CSRF protection.
+- Use Django ORM instead of unsafe SQL construction.
+- Prevent accidental duplicate imports.
+- Record important user actions.
+- Handle unexpected file formats.
+- Escape user-generated content in HTML.
+- Protect downloadable CSV exports against formula injection.
+- Confirm destructive demo reset operations.
+
+A simple local demonstration login is acceptable.
+
+Do not use production credentials or real patient-identifying information.
+
+---
+
+# 21. Required Project Scripts
+
+Provide:
+
+## `setup.sh`
+
+Create the virtual environment, install dependencies, and run migrations.
+
+## `run.sh`
+
+Start the Django web application.
+
+## `run_worker.sh`
+
+Start the background import worker.
+
+## `reset_demo.sh`
+
+Reset the prototype's demonstration state and seed the approved fixtures.
+
+The reset script must be safe, clearly documented, and explicit about what data is deleted.
+
+## `README.md`
+
+Document:
+
+- Project purpose.
+- Technology stack.
+- Setup.
+- How to run.
+- How to upload data.
+- How to run Test Import.
+- How to resolve missing references.
+- How to import eligible records.
+- How to download errors.
+- How to reset the demo.
+- Known prototype limitations.
+
+Do not make Docker a prerequisite.
+
+---
+
+# 22. Automated Tests
+
+At minimum, implement automated tests for critical behavior.
+
+## File Parsing
+
+- All 33 sample headers.
+- Header aliases.
+- Empty values.
+- Leading-zero codes.
+- Malformed CSV.
+- Duplicate rows.
+
+## Validation
+
+- Required fields.
+- Invalid decimals.
+- Invalid dates.
+- Missing references.
+- Hierarchical reference mismatches.
+- Duplicate conflicts.
+
+## Reference Resolution
+
+- Map to existing.
+- Approved creation.
+- Skip.
+- Defer.
+- Retest after resolution.
+
+## Importing
+
+- Create.
+- Update.
+- Upsert.
+- Skip existing.
+- Partial success.
+- Failed row isolation.
+- Idempotent retry.
+
+## Reporting
+
+- Correct summary counts.
+- Correct source row numbers.
+- Error downloads.
+- Failed-record reimport.
+
+## Background Jobs
+
+- Actual progress updates.
+- Resume/retry behavior.
+- Safe interruption handling.
+
+## UI
+
+Test primary views, form submissions, and core navigation.
+
+---
+
+# 23. Explicit Acceptance Criteria
+
+The prototype is considered successful when:
+
+1. It runs locally using Django and SQLite.
+2. It uses the agreed X4Nphies-inspired Bootstrap theme.
+3. It clearly identifies itself as an interactive prototype.
+4. The existing sample CSV uploads successfully.
+5. The application recognizes all 33 columns.
+6. Users can preview real source data.
+7. Users can review and modify suggested field mappings.
+8. Test Import performs actual validation without importing Service Items.
+9. Missing references are identified and grouped.
+10. Users can map references to existing records.
+11. Users can explicitly approve creating new references.
+12. Users can skip or defer affected records.
+13. Retesting reflects user decisions.
+14. Users can import valid records even when other records have errors.
+15. Import execution occurs in a real background worker.
+16. Progress reflects actual database-backed processing.
+17. Imported Service Items appear in the prototype database and UI.
+18. Final results distinguish created, updated, skipped, and failed records.
+19. Users can download accurate error reports.
+20. Failed records can be corrected and reimported.
+21. Import History shows completed executions.
+22. The prototype can be reset for another demonstration.
+23. The code is understandable and easy to modify.
+24. Core functions have automated tests.
+25. Production-only limitations are clearly documented.
+
+---
+
+# 24. Recommended Implementation Phases
+
+Implement incrementally.
+
+## Phase 1 — Project Foundation
+
+Create:
+
+- Django project.
+- SQLite database.
+- Bootstrap theme.
+- Application shell.
+- Navigation.
+- Core Service Item and Reference models.
+- Demo fixtures.
+
+**Deliverable:** A runnable application with a consistent UI.
+
+## Phase 2 — Service Item Management
+
+Implement:
+
+- Listing.
+- Searching.
+- Filtering.
+- Pagination.
+- View/Edit.
+- Export.
+- Sample download.
+
+**Deliverable:** A working local Service Item Management screen.
+
+## Phase 3 — Upload and Mapping
+
+Implement:
+
+- CSV upload.
+- File storage.
+- Parsing.
+- Staging.
+- Preview.
+- Field mapping.
+- Mapping templates.
+
+**Deliverable:** A working upload-to-mapping flow.
+
+## Phase 4 — Test Import
+
+Implement:
+
+- Validation engine.
+- Background validation.
+- Validation results.
+- Errors.
+- Warnings.
+- Duplicate detection.
+
+**Deliverable:** A genuine Test Import workflow.
+
+## Phase 5 — Missing Reference Resolution
+
+Implement:
+
+- Missing-reference grouping.
+- Mapping to existing.
+- Approved reference creation.
+- Skip/defer.
+- Hierarchical validation.
+- Retest.
+
+**Deliverable:** A complete reference-resolution demonstration.
+
+## Phase 6 — Partial-Success Import
+
+Implement:
+
+- Import confirmation.
+- Background worker.
+- Actual database insertion/update.
+- Error isolation.
+- Progress.
+- Job states.
+
+**Deliverable:** Real partial-success import behavior.
+
+## Phase 7 — Reports and History
+
+Implement:
+
+- Final summary.
+- Error reports.
+- Failed-record exports.
+- Correction/reimport.
+- Import history.
+
+**Deliverable:** The complete end-to-end prototype.
+
+## Phase 8 — Demo Readiness
+
+Implement:
+
+- Demo reset.
+- Synthetic mixed-validity dataset.
+- Final UI polish.
+- Tests.
+- README.
+- Presentation walkthrough.
+
+**Deliverable:** A repeatable, stakeholder-ready demonstration.
+
+---
+
+# 25. Working Rules for Codex
+
+Follow these rules throughout implementation.
+
+1. **Keep the solution simple.** Choose the smallest maintainable implementation that meets the feature's requirements.
+
+2. **Use real functionality.** Do not fabricate job progress, successful imports, validation results, or database updates.
+
+3. **Preserve source data.** Always retain original row numbers and values.
+
+4. **Respect user decisions.** Missing references must not be silently created or automatically remapped.
+
+5. **Support partial success.** An invalid independent record must not block valid records.
+
+6. **Maintain clear status semantics.** Distinguish warnings, validation errors, deferred records, skipped records, and runtime failures.
+
+7. **Avoid unnecessary dependencies.** Do not introduce frameworks or infrastructure without a concrete need.
+
+8. **Keep the UI consistent.** Follow the defined Bootstrap healthcare theme.
+
+9. **Optimize for iteration.** Business rules and page layouts should be easy to change after stakeholder feedback.
+
+10. **Use database migrations.** Avoid manually altering the schema.
+
+11. **Write meaningful tests.** Focus on import correctness and error isolation.
+
+12. **Verify before claiming completion.** Run tests and verify the actual browser workflow.
+
+13. **Document limitations.** Make a clear distinction between prototype behavior and future production architecture.
+
+14. **Do not overbuild.** A finished and polished prototype is more valuable than an incomplete enterprise platform.
+
+15. **Keep the implementation technology-independent at the business-logic level.** Do not hardcode Odoo or X4Nphies APIs into the import engine.
+
+---
+
+# 26. Your First Response — Before Coding
+
+Before writing application code, do the following:
+
+1. Read `SERVICE_ITEM_IMPORT_SPEC.md`.
+2. Inspect both HTML reference files.
+3. Examine the sample CSV.
+4. Summarize the prototype's objectives.
+5. Confirm the proposed simple technology stack.
+6. Describe the application screens.
+7. Propose the database models.
+8. Explain the background worker approach.
+9. Describe the missing-reference resolution workflow.
+10. Explain how partial-success importing will work.
+11. Present the development phases.
+12. Identify any unavoidable business decisions still needed.
+
+Do not ask questions that are already answered in the supplied documents.
+
+Do not ask me to choose between multiple frontend frameworks: the stack is already decided.
+
+**Wait for my approval of the implementation plan before writing application code.**
+
+---
+
+# 27. Final Success Definition
+
+We want to open a browser during a team presentation and demonstrate an actual working application.
+
+A stakeholder should be able to:
+
+1. Open the Service Item Import Tool.
+2. Upload a real CSV file.
+3. Inspect the imported data preview.
+4. Map source columns.
+5. Run real validation.
+6. Understand why records failed validation.
+7. Resolve missing references interactively.
+8. Choose to import only eligible records.
+9. Watch genuine background import progress.
+10. Review created, updated, skipped, and failed results.
+11. Download an error report.
+12. Correct errors and retry.
+13. Inspect the successfully imported records.
+14. Understand how this concept could evolve into a production enterprise solution.
+
+**The result must be a polished, fully interactive, standalone dynamic prototype—not an integration, not a static mockup, and not an overengineered production platform.**
