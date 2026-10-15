@@ -278,3 +278,9 @@ class ImportWorkflowTests(TestCase):
             call_command("reset_demo", yes=True, verbosity=0)
         self.assertTrue(ImportJob.objects.filter(pk=job.pk).exists())
         self.assertTrue(Path(job.source_file.path).exists())
+
+    def test_queued_progress_explains_worker_startup(self):
+        job = self.upload(SAMPLE_FILE)
+        job.state = "queued_validation"
+        job.save(update_fields=["state"])
+        self.assertContains(self.client.get(f"/import/{job.pk}/"), "./run_worker.sh")

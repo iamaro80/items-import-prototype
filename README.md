@@ -13,13 +13,7 @@ Python 3.12+, Django 5.2 LTS, SQLite, Django templates, locally bundled Bootstra
 ./run.sh
 ```
 
-In another terminal:
-
-```bash
-./run_worker.sh
-```
-
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000). The worker must remain running for Test Import and final import. Uploaded files, job state, issues, and Service Items persist if the browser closes or the web server restarts.
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000). `run.sh` starts both the web server and import worker. If starting Django directly with `manage.py runserver`, also start `./run_worker.sh` in another terminal; queued Test Import and final import jobs need the worker. Uploaded files, job state, issues, and Service Items persist if the browser closes or the web server restarts.
 
 ## Demonstration walkthrough
 
