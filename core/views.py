@@ -1,9 +1,9 @@
 import csv
 import hashlib
-import shutil
 from pathlib import Path
-from django.conf import settings
 from django.contrib import messages
+from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.core.files import File
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
@@ -444,7 +444,6 @@ def demo(request):
     if request.method == "POST":
         action = request.POST.get("action")
         if action == "seed":
-            from django.core.management import call_command
             call_command("seed_demo")
             messages.success(request, "Deterministic demo references are ready.")
         elif action in {"load_sample", "load_mixed"}:
@@ -463,17 +462,13 @@ def demo(request):
             messages.success(request, "The chosen demo CSV is staged as a new job.")
             return redirect("import_job", pk=job.pk)
         elif action == "reset" and request.POST.get("confirmation") == "RESET DEMO":
-            for job in ImportJob.objects.all():
-                job.source_file.delete(save=False)
-            ImportJob.objects.all().delete()
-            ServiceItem.objects.all().delete()
-            ReferenceValue.objects.filter(parent__isnull=False).delete()
-            ReferenceValue.objects.all().delete()
-            shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
-            Path(settings.MEDIA_ROOT).mkdir(parents=True, exist_ok=True)
-            from django.core.management import call_command
-            call_command("seed_demo")
-            messages.success(request, "Demo jobs and items were deleted; reference fixtures were reseeded.")
+            try:
+                call_command("reset_demo", yes=True, verbosity=0)
+            except CommandError as exc:
+                messages.error(request, str(exc))
+            else:
+                request.session.pop("facility_id", None)
+                messages.success(request, "First-run demo state restored. You can start a new import.")
         else:
             messages.error(request, "Type RESET DEMO to confirm the reset.")
         return redirect("demo")

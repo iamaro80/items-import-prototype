@@ -1,1 +1,48 @@
-{% extends 'base.html' %}{% block title %}Demo Administration{% endblock %}{% block content %}<div class="page-top"><div><div class="eyebrow">Prototype settings</div><h1>Demo Administration</h1><p>Prepare a repeatable team demonstration using fictional fixtures and the unchanged source CSV.</p></div></div><div class="metric-grid"><div class="metric"><div class="label">Service Items</div><div class="value">{{ item_count }}</div></div><div class="metric"><div class="label">Import Jobs</div><div class="value">{{ job_count }}</div></div><div class="metric"><div class="label">References</div><div class="value">{{ reference_count }}</div></div></div><div class="row g-3"><div class="col-lg-6"><div class="panel"><div class="panel-header"><h2>Prepare sample data</h2></div><div class="panel-body"><p class="small-note">Seeding is repeatable. Selected references remain absent so the missing-reference workflow can be demonstrated.</p><form method="post" class="mb-3">{% csrf_token %}<input type="hidden" name="action" value="seed"><button class="btn btn-outline-primary">Seed demo references</button></form><p class="small-note">Stage {{ source_name }} as a new import job. It remains unchanged.</p><form method="post">{% csrf_token %}<input type="hidden" name="action" value="load_sample"><button class="btn btn-teal">Load supplied CSV</button></form><hr><p class="small-note">Stage {{ mixed_name }} to demonstrate invalid decimals, duplicates, a missing reference, and partial success.</p><form method="post">{% csrf_token %}<input type="hidden" name="action" value="load_mixed"><button class="btn btn-outline-teal">Load mixed-validity CSV</button></form></div></div></div><div class="col-lg-6"><div class="panel"><div class="panel-header"><h2>Reset demonstration</h2></div><div class="panel-body"><p class="small-note">This deletes all prototype import jobs, uploaded job records, and Service Items, then restores the deterministic reference fixtures. The original supplied CSV is kept.</p><form method="post">{% csrf_token %}<input type="hidden" name="action" value="reset"><label class="form-label">Type RESET DEMO to confirm</label><input class="form-control mb-3" name="confirmation" autocomplete="off"><button class="btn btn-outline-danger" data-confirm="Delete all prototype jobs, Service Items, and demo references?">Reset demo data</button></form></div></div></div></div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Demo Administration{% endblock %}
+{% block content %}
+<div class="page-top">
+  <div>
+    <div class="eyebrow">Prototype settings</div>
+    <h1>Demo Administration</h1>
+    <p>Prepare a repeatable team demonstration using fictional fixtures and the unchanged source CSV.</p>
+  </div>
+</div>
+<div class="metric-grid">
+  <div class="metric"><div class="label">Service Items</div><div class="value">{{ item_count }}</div></div>
+  <div class="metric"><div class="label">Import Jobs</div><div class="value">{{ job_count }}</div></div>
+  <div class="metric"><div class="label">References</div><div class="value">{{ reference_count }}</div></div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="panel">
+      <div class="panel-header"><h2>Prepare sample data</h2></div>
+      <div class="panel-body">
+        <p class="small-note">Seeding is repeatable. Selected references remain absent so the missing-reference workflow can be demonstrated.</p>
+        <form method="post" class="mb-3">{% csrf_token %}<input type="hidden" name="action" value="seed"><button class="btn btn-outline-primary">Seed demo references</button></form>
+        <p class="small-note">Stage {{ source_name }} as a new import job. It remains unchanged.</p>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="load_sample"><button class="btn btn-teal">Load supplied CSV</button></form>
+        <hr>
+        <p class="small-note">Stage {{ mixed_name }} to demonstrate invalid decimals, duplicates, a missing reference, and partial success.</p>
+        <form method="post">{% csrf_token %}<input type="hidden" name="action" value="load_mixed"><button class="btn btn-outline-teal">Load mixed-validity CSV</button></form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="panel">
+      <div class="panel-header"><h2>Start fresh</h2></div>
+      <div class="panel-body">
+        <p>Restore the demo to its first-run state.</p>
+        <p class="small-note">This removes all Service Items, import jobs and history, uploaded files, saved mappings, and custom references or facilities. It restores the two starter facilities and their reference fixtures. The supplied and synthetic sample CSV files remain available.</p>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="reset">
+          <label class="form-label" for="reset-confirmation">Type RESET DEMO to confirm</label>
+          <input id="reset-confirmation" class="form-control mb-3" name="confirmation" autocomplete="off" required>
+          <button class="btn btn-outline-danger" data-confirm="Restore the demo to its first-run state and remove all current prototype data?">Reset to first-run state</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

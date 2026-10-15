@@ -4,10 +4,11 @@ import tempfile
 from pathlib import Path
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
 from openpyxl import Workbook
 from .management.commands.run_import_worker import run_one
-from .models import Facility, ImportJob, ReferenceValue, ServiceItem
+from .models import Facility, ImportAuditEvent, ImportJob, ImportMappingTemplate, ReferenceValue, ServiceItem
 from .schema import SOURCE_TO_TARGET
 from .views import MIXED_FILE, SAMPLE_FILE, safe_csv
 
@@ -237,11 +238,43 @@ class ImportWorkflowTests(TestCase):
         self.assertEqual(ServiceItem.objects.count(), 3)
         self.assertTrue(job.issues.filter(row=row, code="execution_failed").exists())
 
-    def test_reset_deletes_prototype_data_and_reseeds_references(self):
-        self.upload(SAMPLE_FILE)
+    def test_reset_restores_first_run_state(self):
+        job = self.upload(SAMPLE_FILE)
+        uploaded_path = Path(job.source_file.path)
         ServiceItem.objects.create(facility=self.facility, code="RESET-TEST")
+        ImportMappingTemplate.objects.create(name="Saved mapping", mapping={"Code": "code"})
+        ImportAuditEvent.objects.create(action="orphaned audit")
+        Facility.objects.create(code="CUSTOM", name="Custom Facility")
+        ReferenceValue.objects.create(kind="category", label="Custom", normalized="custom")
         call_command("reset_demo", yes=True, verbosity=0)
         self.assertEqual(ImportJob.objects.count(), 0)
         self.assertEqual(ServiceItem.objects.count(), 0)
-        self.assertTrue(ReferenceValue.objects.filter(kind="chapter", label="Pharmaceuticals").exists())
-        self.assertTrue(ReferenceValue.objects.filter(kind="block", parent__label="Pharmaceuticals").exists())
+        self.assertEqual(ImportMappingTemplate.objects.count(), 0)
+        self.assertEqual(ImportAuditEvent.objects.count(), 0)
+        self.assertEqual(set(Facility.objects.values_list("code", flat=True)), {"KAMC-AH-DEMO", "UAT-DEMO"})
+        self.assertEqual(ReferenceValue.objects.count(), 21)
+        self.assertFalse(uploaded_path.exists())
+        self.assertTrue(SAMPLE_FILE.exists())
+        self.assertTrue(MIXED_FILE.exists())
+
+    def test_demo_reset_action_restores_first_run_state(self):
+        self.upload(SAMPLE_FILE)
+        ImportMappingTemplate.objects.create(name="Saved mapping")
+        session = self.client.session
+        session["facility_id"] = self.facility.pk
+        session.save()
+        response = self.client.post("/demo/", {"action": "reset", "confirmation": "RESET DEMO"}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "First-run demo state restored")
+        self.assertEqual(ImportJob.objects.count(), 0)
+        self.assertEqual(ImportMappingTemplate.objects.count(), 0)
+        self.assertNotIn("facility_id", self.client.session)
+
+    def test_reset_rejects_an_active_import(self):
+        job = self.upload(SAMPLE_FILE)
+        job.state = "importing"
+        job.save(update_fields=["state"])
+        with self.assertRaisesMessage(CommandError, "An import is running"):
+            call_command("reset_demo", yes=True, verbosity=0)
+        self.assertTrue(ImportJob.objects.filter(pk=job.pk).exists())
+        self.assertTrue(Path(job.source_file.path).exists())

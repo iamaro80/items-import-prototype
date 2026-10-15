@@ -36,13 +36,13 @@ For a clear partial-success demonstration, use **Load mixed-validity CSV** in De
 
 ## Reset
 
-Use **Demo Administration → Reset demonstration**, typing `RESET DEMO`, or run:
+Use **Demo Administration → Reset to first-run state**, typing `RESET DEMO`, or run:
 
 ```bash
 ./reset_demo.sh
 ```
 
-Reset deletes all prototype import jobs, their uploaded media files, Service Items, and demo references, then restores deterministic facilities and reference fixtures. It preserves the original package files and synthetic CSV. It does not alter another application or database.
+Reset deletes all prototype import jobs and history, uploaded media files, Service Items, saved mapping templates, references, and facilities. It then restores exactly the two starter facilities and deterministic reference fixtures from setup. It preserves the original package files and synthetic CSV. Wait for any running import to finish or cancel it before resetting. It does not alter another application or database.
 
 ## Tests
 

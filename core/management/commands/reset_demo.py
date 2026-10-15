@@ -1,13 +1,15 @@
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from django.db import transaction
 import shutil
 from pathlib import Path
-from core.models import ImportJob, ReferenceValue, ServiceItem
+from core.models import (Facility, ImportAuditEvent, ImportJob,
+                         ImportMappingTemplate, ReferenceValue, ServiceItem)
 
 
 class Command(BaseCommand):
-    help = "Delete all prototype jobs, uploaded job files, Service Items, and references; then reseed fixtures."
+    help = "Restore the prototype to its first-run state with only starter facilities and references."
 
     def add_arguments(self, parser):
         parser.add_argument("--yes", action="store_true", help="Acknowledge deletion of all prototype data.")
@@ -15,13 +17,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if not options["yes"]:
             raise CommandError("Pass --yes after reviewing which prototype data this command deletes.")
-        for job in ImportJob.objects.all():
-            job.source_file.delete(save=False)
-        ImportJob.objects.all().delete()
-        ServiceItem.objects.all().delete()
-        ReferenceValue.objects.filter(parent__isnull=False).delete()
-        ReferenceValue.objects.all().delete()
+        if ImportJob.objects.filter(state__in=["validating", "importing"]).exists():
+            raise CommandError("An import is running. Wait for it to finish or cancel it before resetting.")
+        with transaction.atomic():
+            ImportAuditEvent.objects.all().delete()
+            ImportJob.objects.all().delete()
+            ImportMappingTemplate.objects.all().delete()
+            ServiceItem.objects.all().delete()
+            ReferenceValue.objects.filter(parent__isnull=False).delete()
+            ReferenceValue.objects.all().delete()
+            Facility.objects.all().delete()
+            call_command("seed_demo", verbosity=0)
         shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
         Path(settings.MEDIA_ROOT).mkdir(parents=True, exist_ok=True)
-        call_command("seed_demo")
-        self.stdout.write(self.style.SUCCESS("Prototype data reset. Original source files remain unchanged."))
+        self.stdout.write(self.style.SUCCESS("First-run demo state restored. Original sample files remain unchanged."))
